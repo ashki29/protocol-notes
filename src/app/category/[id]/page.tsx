@@ -18,10 +18,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const note = await getNote(id)
 
-  if (!note) {
-    notFound()
-  }
-
   return (
     <main className="min-h-screen p-8 max-w-2xl mx-auto">
       <div className="mb-8">
@@ -35,7 +31,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <h1 className="text-2xl font-bold mb-6">{category.name}</h1>
 
-      <NoteEditor note={note} categoryId={id} />
+      <NoteEditor categoryId={id} initialContent={note?.content ?? ''} />
     </main>
   )
 }

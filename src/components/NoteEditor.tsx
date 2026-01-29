@@ -3,20 +3,13 @@
 import { useState } from 'react'
 import { saveNote } from '@/lib/actions/notes'
 
-interface Note {
-  id: string
-  category_id: string
-  content: string
-  updated_at: string
-}
-
 interface NoteEditorProps {
-  note: Note
   categoryId: string
+  initialContent?: string
 }
 
-export default function NoteEditor({ note, categoryId }: NoteEditorProps) {
-  const [content, setContent] = useState(note.content)
+export default function NoteEditor({ categoryId, initialContent = '' }: NoteEditorProps) {
+  const [content, setContent] = useState(initialContent)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 

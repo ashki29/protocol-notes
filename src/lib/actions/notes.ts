@@ -13,23 +13,9 @@ export async function getNote(categoryId: string) {
     .single()
 
   if (error) {
-    // Note doesn't exist, create one
-    if (error.code === 'PGRST116') {
-      const { data: newNote, error: createError } = await supabase
-        .from('notes')
-        .insert({ category_id: categoryId, content: '' })
-        .select()
-        .single()
-
-      if (createError) {
-        console.error('Error creating note:', createError)
-        return null
-      }
-
-      return newNote
+    if (error.code !== 'PGRST116') {
+      console.error('Error fetching note:', error)
     }
-
-    console.error('Error fetching note:', error)
     return null
   }
 
@@ -41,8 +27,10 @@ export async function saveNote(categoryId: string, content: string) {
 
   const { error } = await supabase
     .from('notes')
-    .update({ content, updated_at: new Date().toISOString() })
-    .eq('category_id', categoryId)
+    .upsert(
+      { category_id: categoryId, content, updated_at: new Date().toISOString() },
+      { onConflict: 'category_id' }
+    )
 
   if (error) {
     return { error: error.message }
