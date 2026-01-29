@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Protocol Notes
 
-## Getting Started
+A minimal personal notes app with user-defined categories, each containing a single editable plain-text note. Built with Next.js + TypeScript, using Supabase for Auth + Postgres + RLS.
 
-First, run the development server:
+## Features
+
+- Email-based authentication
+- User-defined categories with CRUD operations
+- One note per category with auto-save
+- Auto-creates 5 default categories on first login: Exercise, Diet, Supplements, Mobility, Other
+- Row Level Security (RLS) ensures users can only access their own data
+
+## Setup
+
+### 1. Supabase Project
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to the SQL Editor and run the schema from `supabase-schema.sql`
+3. Go to Authentication > Providers and ensure Email auth is enabled
+4. Copy your project URL and anon key from Settings > API
+
+### 2. Local Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Vercel Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Home page (category list)
+│   ├── login/
+│   │   └── page.tsx         # Login/signup page
+│   └── category/
+│       └── [id]/
+│           └── page.tsx     # Note editor page
+├── components/
+│   ├── AuthForm.tsx         # Login/signup form
+│   ├── CategoryList.tsx     # List of categories
+│   ├── CategoryItem.tsx     # Single category with actions
+│   ├── CreateCategory.tsx   # New category form
+│   └── NoteEditor.tsx       # Textarea + save button
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts        # Browser client
+│   │   ├── server.ts        # Server client
+│   │   └── middleware.ts    # Auth middleware helper
+│   └── actions/
+│       ├── auth.ts          # Auth actions
+│       ├── categories.ts    # Category CRUD
+│       └── notes.ts         # Note CRUD
+└── middleware.ts            # Route protection
+```
 
-## Deploy on Vercel
+## Verification Checklist
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Auth**: Sign up with email, log out, log back in
+2. **Auto-create defaults**: On first login, verify 5 categories appear
+3. **Create category**: Add new category, verify it appears
+4. **Rename category**: Rename a category, verify change persists
+5. **Delete category**: Delete with confirmation, verify removal
+6. **Edit note**: Open category, type text, save, refresh, verify persistence
+7. **RLS**: Try accessing another user's category ID in URL (should fail)
