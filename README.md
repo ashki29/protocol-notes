@@ -23,6 +23,37 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
+## Install on Android (Termux + PWA)
+
+### 1. Run locally on your phone
+
+```bash
+pkg update -y
+pkg upgrade -y
+pkg install -y nodejs git
+
+git clone git@github.com:ashki29/protocol-notes.git
+cd protocol-notes
+npm install
+
+npm run dev -- --hostname 0.0.0.0 --port 3000
+```
+
+### 2. Open in Chrome
+
+Go to `http://127.0.0.1:3000` (or `http://localhost:3000`).
+
+### 3. Add to Home Screen
+
+In Chrome: menu (⋮) → **Add to Home screen** → **Install**.
+
+### Optional (production mode)
+
+```bash
+npm run build
+npm run start -- --hostname 0.0.0.0 --port 3000
+```
+
 ## Project Structure
 
 ```
