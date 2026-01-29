@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { saveNote } from '@/lib/actions/notes'
+import { saveNote } from '@/lib/storage/local'
 
 interface NoteEditorProps {
   categoryId: string
@@ -17,15 +17,14 @@ export default function NoteEditor({ categoryId, initialContent = '' }: NoteEdit
     setSaving(true)
     setSaved(false)
 
-    const result = await saveNote(categoryId, content)
-
-    setSaving(false)
-
-    if (result.error) {
-      alert(result.error)
-    } else {
+    try {
+      await saveNote(categoryId, content)
+      setSaving(false)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      setSaving(false)
+      alert(err instanceof Error ? err.message : 'Failed to save note')
     }
   }
 

@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { createCategory } from '@/lib/actions/categories'
 
-export default function CreateCategory() {
+interface CreateCategoryProps {
+  onCreate: (name: string) => Promise<{ error?: string }>
+}
+
+export default function CreateCategory({ onCreate }: CreateCategoryProps) {
   const [isCreating, setIsCreating] = useState(false)
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -12,10 +15,7 @@ export default function CreateCategory() {
     if (!name.trim()) return
 
     setLoading(true)
-    const formData = new FormData()
-    formData.append('name', name)
-
-    const result = await createCategory(formData)
+    const result = await onCreate(name)
     setLoading(false)
 
     if (result.error) {

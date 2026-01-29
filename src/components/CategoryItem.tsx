@@ -2,19 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { renameCategory, deleteCategory } from '@/lib/actions/categories'
-
-interface Category {
-  id: string
-  name: string
-  created_at: string
-}
+import type { Category } from '@/lib/storage/local'
 
 interface CategoryItemProps {
   category: Category
+  onRename: (categoryId: string, newName: string) => Promise<{ error?: string }>
+  onDelete: (categoryId: string) => Promise<{ error?: string }>
 }
 
-export default function CategoryItem({ category }: CategoryItemProps) {
+export default function CategoryItem({ category, onRename, onDelete }: CategoryItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState(category.name)
   const [loading, setLoading] = useState(false)
@@ -26,7 +22,7 @@ export default function CategoryItem({ category }: CategoryItemProps) {
     }
 
     setLoading(true)
-    const result = await renameCategory(category.id, name)
+    const result = await onRename(category.id, name)
     setLoading(false)
 
     if (result.error) {
@@ -40,7 +36,7 @@ export default function CategoryItem({ category }: CategoryItemProps) {
     if (!confirm(`Delete "${category.name}" and its note?`)) return
 
     setLoading(true)
-    const result = await deleteCategory(category.id)
+    const result = await onDelete(category.id)
     setLoading(false)
 
     if (result.error) {
